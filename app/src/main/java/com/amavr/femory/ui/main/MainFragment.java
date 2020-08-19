@@ -1,5 +1,6 @@
 package com.amavr.femory.ui.main;
 
+import androidx.core.view.DragStartHelper;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -20,6 +21,7 @@ import com.amavr.femory.MainActivity;
 import com.amavr.femory.R;
 import com.amavr.femory.data.IRepository;
 import com.amavr.femory.ext.ChangedTextCallback;
+import com.amavr.femory.ext.OnStartDragListener;
 import com.amavr.femory.ext.Tools;
 import com.amavr.femory.models.GroupInfo;
 import com.amavr.femory.ext.SwipeController;
@@ -28,7 +30,7 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements OnStartDragListener {
 
     static final String TAG = "XDBG.MainFragment";
 
@@ -37,6 +39,7 @@ public class MainFragment extends Fragment {
 
     RecyclerView rvGroups;
     GroupAdapter adp;
+    ItemTouchHelper itemTouchHelper;
     IRepository repository;
 
 
@@ -57,7 +60,7 @@ public class MainFragment extends Fragment {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rvGroups.setLayoutManager(manager);
 
-        adp = new GroupAdapter(this);
+        adp = new GroupAdapter(this, this);
         rvGroups.setAdapter(adp);
         FloatingActionButton fab = (FloatingActionButton)view.findViewById(R.id.fabNewGroup);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +81,7 @@ public class MainFragment extends Fragment {
         });
 
         SwipeController swipeController = new SwipeController(adp);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeController);
+        itemTouchHelper = new ItemTouchHelper(swipeController);
         itemTouchHelper.attachToRecyclerView(rvGroups);
 
 
@@ -112,5 +115,10 @@ public class MainFragment extends Fragment {
         super.onStart();
         ((MainActivity) getActivity()).setTitle("Списки");
 //        RecyclerView
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
     }
 }

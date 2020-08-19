@@ -2,6 +2,7 @@ package com.amavr.femory.ui.main;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -9,12 +10,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amavr.femory.R;
 import com.amavr.femory.ext.ItemTouchHelperAdapter;
 import com.amavr.femory.ext.ItemTouchHelperViewHolder;
+import com.amavr.femory.ext.OnStartDragListener;
 import com.amavr.femory.models.GroupInfo;
 
 import java.util.ArrayList;
@@ -27,14 +30,17 @@ public class GroupAdapter
 
     static final String TAG = "XDBG.grp-adpater";
 
+    private final OnStartDragListener mDragStartListener;
+
     int SelectedColor;
     int NormalColor;
 
     Fragment fragment;
     List<GroupInfo> groups;
 
-    public GroupAdapter(Fragment fragment) {
+    public GroupAdapter(Fragment fragment, OnStartDragListener dragStartListener) {
         this.fragment = fragment;
+        this.mDragStartListener = dragStartListener;
         this.groups = new ArrayList<>();
         this.SelectedColor = ContextCompat.getColor(fragment.getContext(), R.color.colorAccent);
         this.NormalColor = ContextCompat.getColor(fragment.getContext(), R.color.colorPrimaryDark);
@@ -50,8 +56,18 @@ public class GroupAdapter
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         GroupInfo gi = this.groups.get(position);
-        GroupHolder grp_holder = (GroupHolder) holder;
+        final GroupHolder grp_holder = (GroupHolder) holder;
         grp_holder.tvName.setText(gi.name);
+
+        grp_holder.btnRename.setOnTouchListener(new View.OnTouchListener(){
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    mDragStartListener.onStartDrag(grp_holder);
+                }
+                return false;            }
+        });
     }
 
     @Override

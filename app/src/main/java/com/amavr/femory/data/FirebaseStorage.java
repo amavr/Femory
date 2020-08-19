@@ -6,7 +6,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.amavr.femory.BuildConfig;
+import com.amavr.femory.ext.Tools;
 import com.amavr.femory.models.GroupInfo;
+import com.amavr.femory.models.ItemInfo;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 public class FirebaseStorage implements IRemoteStorage, ValueEventListener {
@@ -60,9 +63,15 @@ public class FirebaseStorage implements IRemoteStorage, ValueEventListener {
 
     @Override
     public GroupInfo addGroup(String key, String name){
+
+        ItemInfo ii = new ItemInfo();
+        ii.key = Tools.generateKey();
+        ii.name = Calendar.getInstance().getTime().toString();
+
         GroupInfo gi = new GroupInfo();
         gi.key = key;
         gi.name = name;
+        gi.items.add(ii);
         DatabaseReference ref = createRef("lists/" + key, this);
         ref.setValue(gi);
         gi.ref = ref;
